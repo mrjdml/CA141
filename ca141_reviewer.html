@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastral Codex — CA 141 Public Land Act Reviewer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --slate:#182f38;
+  --slate-2:#20404c;
+  --copper:#b8763a;
+  --copper-light:#ddab73;
+  --rust:#8a3324;
+  --rust-light:#b3573f;
+  --parchment:#f2ead2;
+  --parchment-2:#e9dfba;
+  --line:#d9c79a;
+  --ink:#241f16;
+  --ink-soft:#5c5540;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --serif:'Spectral', Georgia, 'Times New Roman', serif;
+  --mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--slate);
+  color:var(--ink);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--copper-light); color:var(--slate);}
+
+.app{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+@media (max-width:900px){ .app{grid-template-columns:1fr;} }
+
+.sidebar{
+  background:var(--slate); color:#d9e2e3; padding:28px 20px 24px;
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid rgba(221,171,115,0.18);
+}
+@media (max-width:900px){
+  .sidebar{position:static; height:auto; border-right:none; border-bottom:1px solid rgba(221,171,115,0.18); padding:18px 16px;}
+}
+.crest{ display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+.crest-mark{
+  width:44px;height:44px;flex:0 0 44px; border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, var(--copper-light), var(--copper) 55%, #8a5a26 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif); font-weight:700; color:var(--slate); font-size:12px;
+  box-shadow:0 0 0 3px rgba(221,171,115,0.15);
+}
+.crest-text .k1{font-family:var(--serif); font-size:19px; font-weight:600; color:#f2ecd8; line-height:1.1;}
+.crest-text .k2{font-size:11px; letter-spacing:.04em; color:#9db0ae; margin-top:2px;}
+
+.nav-group-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.11em; color:#7c9694; margin:20px 0 8px; font-weight:600; }
+.nav-group-label:first-of-type{margin-top:4px;}
+nav.tabs{display:flex; flex-direction:column; gap:2px;}
+@media (max-width:900px){ nav.tabs{flex-direction:row; flex-wrap:wrap;} }
+.tab-btn{
+  all:unset; cursor:pointer; display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:7px; font-size:13.5px; color:#c2d1d0;
+  transition:background .15s ease, color .15s ease;
+}
+.tab-btn:hover{background:rgba(221,171,115,0.08); color:#f2ecd8;}
+.tab-btn.active{background:rgba(221,171,115,0.14); color:#f2ecd8; font-weight:600;}
+.tab-btn .dot{width:6px;height:6px;border-radius:50%;background:#4d6664; flex:0 0 6px;}
+.tab-btn.active .dot{background:var(--copper-light);}
+
+.side-foot{ margin-top:26px; padding-top:16px; border-top:1px solid rgba(221,171,115,0.15); font-size:11px; color:#7c9694; line-height:1.6; }
+
+main.content{ background:var(--parchment); min-height:100vh; }
+.topbar{
+  position:sticky; top:0; z-index:20; background:var(--parchment); border-bottom:1px solid var(--line);
+  padding:16px 32px; display:flex; gap:16px; align-items:center;
+}
+@media (max-width:640px){ .topbar{padding:12px 16px; flex-wrap:wrap;} }
+.search-wrap{flex:1; position:relative; max-width:480px;}
+.search-wrap input{
+  width:100%; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--line);
+  background:#fff; font-family:var(--sans); font-size:13.5px; color:var(--ink); outline:none;
+}
+.search-wrap input:focus{border-color:var(--copper);}
+.search-wrap svg{position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:.45;}
+.topbar-title{font-family:var(--serif); font-size:15px; color:var(--ink-soft); margin-left:auto; white-space:nowrap;}
+@media (max-width:640px){ .topbar-title{display:none;} }
+
+.view{padding:32px; max-width:920px; margin:0 auto;}
+@media (max-width:640px){ .view{padding:20px 16px;} }
+.view-header{margin-bottom:26px;}
+.eyebrow-row{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+.badge-pill{ font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; background:var(--slate); color:var(--copper-light); padding:3px 9px; border-radius:20px; }
+h1.view-title{font-family:var(--serif); font-size:32px; font-weight:600; margin:0 0 8px; color:var(--slate); line-height:1.15;}
+p.view-sub{font-size:14.5px; color:var(--ink-soft); max-width:60ch; line-height:1.6; margin:0;}
+
+.stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:24px 0 30px;}
+@media (max-width:700px){ .stat-row{grid-template-columns:repeat(2,1fr);} }
+.stat-card{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px; }
+.stat-card .n{font-family:var(--serif); font-size:26px; color:var(--rust); font-weight:600; line-height:1;}
+.stat-card .l{font-size:11.5px; color:var(--ink-soft); margin-top:6px;}
+
+.home-timeline{border-left:2px solid var(--line); margin-left:8px; padding-left:22px; display:flex; flex-direction:column; gap:20px;}
+.tl-item{position:relative;}
+.tl-item::before{
+  content:''; position:absolute; left:-28.5px; top:3px; width:11px; height:11px; border-radius:50%;
+  background:var(--copper); border:2px solid var(--parchment); box-shadow:0 0 0 2px var(--copper);
+}
+.tl-date{font-family:var(--mono); font-size:12px; color:var(--rust); font-weight:600;}
+.tl-title{font-family:var(--serif); font-size:16.5px; font-weight:600; color:var(--slate); margin:2px 0 3px;}
+.tl-desc{font-size:13.5px; color:var(--ink-soft); line-height:1.55; max-width:62ch;}
+
+.quicklinks{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:26px;}
+@media (max-width:640px){ .quicklinks{grid-template-columns:1fr;} }
+.qlink{ display:block; text-decoration:none; background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px 18px; cursor:pointer; transition:border-color .15s, transform .1s; }
+.qlink:hover{border-color:var(--copper);}
+.qlink .qt{font-family:var(--serif); font-weight:600; color:var(--slate); font-size:15px;}
+.qlink .qd{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+
+.article-block{margin-bottom:34px;}
+.article-heading{
+  font-family:var(--serif); font-size:19px; font-weight:600; color:var(--slate);
+  padding-bottom:8px; margin-bottom:14px; border-bottom:2px solid var(--copper);
+  display:flex; align-items:baseline; gap:10px;
+}
+.article-heading .tag{font-family:var(--mono); font-size:11px; color:var(--rust); font-weight:600;}
+
+.sec-card{ background:#fff; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden; }
+.sec-head{ all:unset; box-sizing:border-box; cursor:pointer; width:100%; display:flex; align-items:center; gap:12px; padding:14px 16px; }
+.sec-num{ font-family:var(--mono); font-size:12px; color:#fff; background:var(--slate); padding:3px 8px; border-radius:5px; flex:0 0 auto; white-space:nowrap; }
+.sec-title{font-family:var(--serif); font-weight:600; font-size:15px; color:var(--ink); flex:1;}
+.sec-chevron{transition:transform .2s ease; color:var(--ink-soft); flex:0 0 auto;}
+.sec-card.open .sec-chevron{transform:rotate(180deg);}
+.sec-body{ max-height:0; overflow:hidden; transition:max-height .25s ease; padding:0 16px; }
+.sec-card.open .sec-body{padding:0 16px 16px;}
+.sec-body-inner{font-size:14px; line-height:1.65; color:var(--ink);}
+.sec-body-inner p{margin:0 0 10px;}
+.sec-body-inner ul{margin:0 0 10px; padding-left:20px;}
+.sec-body-inner li{margin-bottom:5px;}
+.kw{ background:linear-gradient(transparent 60%, var(--copper-light) 60%); font-weight:600; }
+.trap-box{ background:#f7e9e3; border-left:3px solid var(--rust); border-radius:6px; padding:10px 12px; font-size:13px; color:#5c2317; margin-top:8px; display:flex; gap:8px; }
+.trap-box .lbl{font-family:var(--mono); font-weight:700; font-size:10.5px; color:var(--rust); white-space:nowrap; padding-top:1px;}
+
+.glossary-grid{display:grid; grid-template-columns:1fr; gap:10px;}
+.g-card{background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+.g-term{font-family:var(--serif); font-weight:700; color:var(--slate); font-size:15px;}
+.g-abbr{font-family:var(--mono); font-size:11px; color:var(--rust); margin-left:6px;}
+.g-def{font-size:13.5px; color:var(--ink-soft); margin-top:4px; line-height:1.55;}
+
+.people-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+@media (max-width:640px){ .people-grid{grid-template-columns:1fr;} }
+.p-card{background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px;}
+.p-name{font-family:var(--serif); font-weight:700; color:var(--slate); font-size:16px;}
+.p-role{font-size:11.5px; color:var(--rust); font-weight:600; margin:2px 0 8px; text-transform:uppercase; letter-spacing:.03em;}
+.p-desc{font-size:13px; color:var(--ink-soft); line-height:1.55;}
+
+.trap-list{display:flex; flex-direction:column; gap:10px;}
+.trap-item{ background:#fff; border:1px solid var(--line); border-left:4px solid var(--rust); border-radius:8px; padding:14px 16px; }
+.trap-item .tnum{font-family:var(--mono); font-size:11px; color:var(--rust); font-weight:700;}
+.trap-item .ttitle{font-family:var(--serif); font-weight:600; font-size:14.5px; color:var(--slate); margin:3px 0 4px;}
+.trap-item .tbody{font-size:13.5px; color:var(--ink-soft); line-height:1.55;}
+
+.quiz-box{background:#fff; border:1px solid var(--line); border-radius:12px; padding:22px;}
+.quiz-progress{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-bottom:10px;}
+.quiz-q{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--slate); margin-bottom:16px; line-height:1.4;}
+.quiz-opts{display:flex; flex-direction:column; gap:8px;}
+.quiz-opt{
+  all:unset; box-sizing:border-box; cursor:pointer; display:block; padding:11px 14px;
+  border:1px solid var(--line); border-radius:8px; font-size:13.5px; transition:border-color .15s, background .15s;
+}
+.quiz-opt:hover{border-color:var(--copper);}
+.quiz-opt.correct{background:#eaf3ea; border-color:#4c6b52; color:#284a2c; font-weight:600;}
+.quiz-opt.wrong{background:#f7e9e3; border-color:var(--rust); color:#5c2317; font-weight:600;}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-explain{ margin-top:14px; padding:12px 14px; background:var(--parchment-2); border-radius:8px; font-size:13px; color:var(--ink-soft); line-height:1.55; display:none; }
+.quiz-explain.show{display:block;}
+.quiz-nav{display:flex; justify-content:space-between; align-items:center; margin-top:18px;}
+.btn{ all:unset; cursor:pointer; font-family:var(--sans); font-weight:600; font-size:13px; background:var(--slate); color:#f2ecd8; padding:10px 18px; border-radius:7px; }
+.btn:hover{background:var(--slate-2);}
+.btn.ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--line);}
+.quiz-score{font-family:var(--serif); font-size:22px; color:var(--slate); text-align:center; padding:20px 0;}
+.quiz-score .sub{font-family:var(--sans); font-size:13px; color:var(--ink-soft); font-weight:400; margin-top:6px;}
+
+.hidden{display:none !important;}
+.nores{padding:40px 0; text-align:center; color:var(--ink-soft); font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="crest">
+      <div class="crest-mark">CA141</div>
+      <div class="crest-text">
+        <div class="k1">Cadastral Codex</div>
+        <div class="k2">Public Land Act · REB &amp; REA</div>
+      </div>
+    </div>
+
+    <div class="nav-group-label">Reviewer</div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="home"><span class="dot"></span>Overview</button>
+      <button class="tab-btn" data-tab="law"><span class="dot"></span>CA 141 — Full Text</button>
+      <button class="tab-btn" data-tab="modes"><span class="dot"></span>Modes of Disposition</button>
+      <button class="tab-btn" data-tab="related"><span class="dot"></span>Related Laws</button>
+    </nav>
+
+    <div class="nav-group-label">Study Aids</div>
+    <nav class="tabs">
+      <button class="tab-btn" data-tab="people"><span class="dot"></span>Dates &amp; People</button>
+      <button class="tab-btn" data-tab="glossary"><span class="dot"></span>Glossary of Terms</button>
+      <button class="tab-btn" data-tab="traps"><span class="dot"></span>Board Exam Traps</button>
+      <button class="tab-btn" data-tab="quiz"><span class="dot"></span>Self-Test Quiz</button>
+    </nav>
+
+    <div class="side-foot">
+      Built for BSREM review — High-Yield topic for both REB General/Fundamentals and REA Land Management &amp; Real Property Laws. Content condensed from Commonwealth Act No. 141 (1936) and its amendments — RA 6940, RA 9176, RA 10023, RA 11231, and RA 11573 (with its IRR, DAO 2021-38) — plus RA 730. Verify against official DENR/LMB issuances before your exam.
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="Search sections, terms, dates, traps…">
+      </div>
+      <div class="topbar-title" id="topbarTitle">Overview</div>
+    </div>
+
+    <div class="view" id="viewRoot"></div>
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+const timeline = [
+  {date:"Nov 29, 1919", title:"Act No. 2874 — the first Public Land Act", desc:"The direct predecessor of CA 141, establishing the original framework for classifying and disposing of public domain lands."},
+  {date:"Nov 7, 1936", title:"Commonwealth Act No. 141 approved", desc:"The National Assembly, under Commonwealth President Manuel L. Quezon, approves \u201cThe Public Land Act,\u201d consolidating and recodifying all prior public-land laws into one comprehensive statute."},
+  {date:"Dec 1, 1936", title:"CA 141 takes effect", desc:"Per its own Sec. 136 — the Act's default effectivity date, unless the President proclaimed an earlier one."},
+  {date:"Jun 18, 1952", title:"RA 730 enacted", desc:"Allows the sale (without public auction) of public land not exceeding 1,000 sqm to actual occupants who have built their residence on it."},
+  {date:"Apr 16, 1982", title:"BP 223 enacted", desc:"\u201cAn Act to Hasten Titling of Residential Lands of the Public Domain\u201d — the direct predecessor of RA 10023, establishing the first residential free-patent mechanism, nearly three decades before RA 10023 modernized it."},
+  {date:"1977", title:"PD 1073 fixes the \u201cJune 12, 1945\u201d baseline", desc:"Amends CA 141 Sec. 48(b) — judicial confirmation of imperfect title shifts from an open-ended rolling possession period to requiring possession dating back to June 12, 1945."},
+  {date:"Mar 28, 1990", title:"RA 6940 amends Sec. 44", desc:"President Corazon C. Aquino signs the law setting a ~30-year continuous occupation/cultivation requirement (counted back from this law's own effectivity) for agricultural free patents, replacing the old fixed 1926 cutoff, and extending filing deadlines to December 31, 2000."},
+  {date:"Nov 13, 2002", title:"RA 9176 extends filing deadlines again", desc:"President Gloria Macapagal-Arroyo signs the law further extending the sunset date for free-patent and judicial-confirmation applications to December 31, 2020; its IRR (DAO 36-02) launches the DENR's \u201cHandog Titulo\u201d Program branding."},
+  {date:"Mar 9, 2010", title:"RA 10023 — Residential Free Patent Act signed", desc:"President Gloria Macapagal-Arroyo signs the law extending the free-patent mechanism to residential (not just agricultural) public land, with much shorter 10-year occupancy and tiered area limits."},
+  {date:"May 23, 2011", title:"DAO 2011-06 issued", desc:"DENR Secretary Ramon J.P. Paje issues guidelines letting LGUs partner with DENR on public land titling — LGU officials are deputized as Deputy Public Land Inspectors, while DENR retains final approval authority."},
+  {date:"Feb 22, 2019", title:"RA 11231 — Agricultural Free Patent Reform Act signed", desc:"President Rodrigo Duterte signs the law removing the old 5-year non-alienation restriction on agricultural free patents and allowing corporations/partnerships to acquire them — retroactively."},
+  {date:"Dec 31, 2020", title:"RA 9176's filing deadline lapses", desc:"The last statutory sunset date for free-patent and judicial-confirmation filings — abolished entirely just months later by RA 11573."},
+  {date:"Jul 16, 2021", title:"RA 11573 signed", desc:"President Rodrigo Duterte signs the law shortening the possession period for both free patents and judicial confirmation to 20 years, abolishing the filing deadline altogether, and simplifying proof of alienable-and-disposable status."},
+  {date:"Sep 2021", title:"DAO 2021-38 — IRR of RA 11573 issued", desc:"The DENR issues its implementing rules within the 60-day window RA 11573 itself set, detailing the Alienable and Disposable Land Certification procedure and area-based approval routing."},
+];
+
+const people = [
+  {name:"Pres. Manuel L. Quezon", role:"Commonwealth President (1936)", desc:"CA 141 was approved by the National Assembly during his presidency, consolidating decades of prior public-land legislation."},
+  {name:"Secretary of Agriculture and Commerce", role:"CA 141's original administering official", desc:"The Cabinet officer CA 141 itself names as executing the Act through the Director of Lands — functionally the ancestor of today's DENR Secretary (DENR was created only in 1987 via EO 192)."},
+  {name:"Director of Lands", role:"Original executive implementer", desc:"Had direct executive control of survey, classification, lease, sale, and disposition of public lands under CA 141 — the ancestor of today's Director of the Land Management Bureau (LMB)."},
+  {name:"Pres. Corazon C. Aquino", role:"Signed RA 6940 (1990)", desc:"Signed the first major reform of the free-patent possession rule, on March 28, 1990 — two decades before RA 10023 and nearly three before RA 11231."},
+  {name:"Pres. Gloria Macapagal-Arroyo", role:"Signed RA 9176 (2002) &amp; RA 10023 (2010)", desc:"Signed both the last pre-RA 11573 filing-deadline extension and, eight years later, the Residential Free Patent Act."},
+  {name:"Pres. Rodrigo Duterte", role:"Signed RA 11231 (2019) &amp; RA 11573 (2021)", desc:"Signed both the Agricultural Free Patent Reform Act and the landmark law simplifying imperfect-title confirmation."},
+  {name:"Ramon J.P. Paje", role:"DENR Secretary who issued DAO 2011-06", desc:"Signed the guidelines letting LGUs partner with DENR on public land titling, deputizing LGU officials as Deputy Public Land Inspectors."},
+  {name:"DENR", role:"Current implementing department", desc:"Successor to the old Department of Agriculture and Natural Resources — now administers CA 141 through its Land Management Bureau (LMB), CENRO, and PENRO offices."},
+  {name:"CENRO / PENRO", role:"Frontline processing offices", desc:"Community and Provincial Environment and Natural Resources Offices — the current first points of filing for free patent applications under RA 11573's routing rules."},
+];
+
+const glossary = [
+  {term:"Alienable and disposable (A&amp;D) land", abbr:"", def:"Public land the President has classified as available for private acquisition — as distinguished from timber/forest, mineral, and national park land, which generally cannot become private property."},
+  {term:"Homestead", abbr:"CA 141, Ch. III", def:"A grant of up to 24 hectares of agricultural public land to a qualified citizen who personally occupies, cultivates, and eventually proves compliance to earn a patent."},
+  {term:"Sales patent", abbr:"CA 141, Ch. IV", def:"Public agricultural land acquired through public bidding/auction — up to 144 hectares for an individual, up to 1,024 hectares for a 60%-Filipino corporation/association."},
+  {term:"Free patent (agricultural)", abbr:"Sec. 44, as amended by RA 6940 &amp; RA 11573", def:"An administrative (non-court) grant of up to 12 hectares of agricultural public land to a natural-born citizen who has continuously occupied/cultivated it for at least 20 years immediately preceding the application."},
+  {term:"Free patent (residential)", abbr:"RA 10023", def:"An administrative grant of residential public land to any Filipino citizen actual occupant, capped at 200–1,000 sqm depending on city/municipality classification, requiring only 10 years' occupancy."},
+  {term:"Judicial confirmation of imperfect title", abbr:"Sec. 48(b), as amended by RA 11573", def:"A COURT process (not administrative) converting long possession of A&amp;D public land into a full Torrens title — now requires 20 years' open, continuous, exclusive, and notorious (OCEN) possession immediately preceding filing."},
+  {term:"OCEN possession", abbr:"Open, Continuous, Exclusive, Notorious", def:"The quality of possession required for judicial confirmation — must be visible/known to the public, unbroken, exclusive to the claimant, and widely recognized as ownership-like."},
+  {term:"Reversion", abbr:"Sec. 101", def:"The legal action, filed by the Solicitor General in the name of the Republic, to return improperly/fraudulently acquired public land back to State ownership."},
+  {term:"CENRO / PENRO", abbr:"Community / Provincial Environment and Natural Resources Office", def:"DENR field offices; CENRO is the first point of filing for free-patent applications, which route upward to PENRO, the DENR Regional Director, or the DENR Secretary depending on the area involved."},
+  {term:"LMB", abbr:"Land Management Bureau", def:"The DENR bureau that succeeded the old Bureau of Lands as the central office overseeing public land administration and disposition."},
+  {term:"Imperfect / incomplete title", abbr:"", def:"A claim to land based on long possession that has not yet been formally confirmed/registered — the raw material that judicial confirmation or free patent proceedings convert into a full Torrens title."},
+  {term:"National cultural minorities", abbr:"CA 141's own historical term", def:"CA 141's original (1936-era) terminology for what IPRA (1997) later formally recognizes and protects as Indigenous Cultural Communities/Indigenous Peoples (ICCs/IPs) — the older term persists in CA 141's own unamended text but should not be used in modern practice."},
+  {term:"Repurchase right", abbr:"Sec. 119", def:"The right of a free-patent/homestead grantee (or their widow/heirs) to buy back land they had conveyed away, within 5 years from the conveyance — still available for pre-RA 11231 transactions made in good faith."},
+  {term:"Handog Titulo", abbr:"Recurring DENR program branding", def:"A titling-assistance branding the DENR has reused across multiple issuances — RA 9176's own IRR (DAO 36-02, 2002), the DENR-LGU partnership guidelines (DAO 2011-06, 2011), and their barangay-level reinforcement (DAO 2019-08) — all packaged under this same public-facing program name."},
+  {term:"Deputy Public Land Inspector (DPLI)", abbr:"DAO 2011-06", def:"An LGU official whom a DENR Regional Executive Director deputizes to assist in public land adjudication under a DENR-LGU titling partnership — works alongside a DENR Land Management Officer, but DENR retains final approval/signing authority."},
+];
+
+/* ---------- CA 141, condensed by Title/Chapter ---------- */
+const raArticles = [
+{
+  heading:"Title I — Application, Classification &amp; Survey",
+  tag:"Secs. 1–10",
+  sections:[
+    {num:"Secs. 1–5", title:"Short title, coverage, and administering officers", body:"<p>Cited as <span class='kw'>\u201cThe Public Land Act.\u201d</span> Applies to lands of the public domain, EXCLUDING timber and mineral lands (governed by special laws) and \u201cfriar lands\u201d (governed separately). Originally administered by the Secretary of Agriculture and Commerce through the Director of Lands — today, functionally the DENR Secretary through the Land Management Bureau.</p>"},
+    {num:"Sec. 6", title:"Classification into three broad classes", body:"<p>The President classifies public domain lands into <span class='kw'>(a) alienable or disposable; (b) timber; and (c) mineral</span> — and may reclassify/transfer lands between classes at any time.</p>"},
+    {num:"Secs. 7–8", title:"Declaring lands open to disposition", body:"<p>Only OFFICIALLY DELIMITED, CLASSIFIED, and (when practicable) SURVEYED lands may be declared open to disposition — lands already reserved, appropriated, or privately claimed are excluded. The President may, for public interest, open unsurveyed land or suspend disposition altogether.</p>"},
+    {num:"Sec. 9", title:"Sub-classification by use", body:"<p>Alienable/disposable lands are further sub-classified as: <span class='kw'>(a) agricultural; (b) residential, commercial, industrial or similar productive purposes; (c) educational, charitable, or similar purposes; (d) reservations for town sites and public/quasi-public uses.</span></p>", trap:"This Sec. 9 four-way sub-classification is the DIRECT ancestor of Article XII, Sec. 3's own \u201cagricultural, forest/timber, mineral, national parks\u201d classification in the 1987 Constitution — related but not identical lists, don't merge them."},
+    {num:"Sec. 10", title:"Definition of alienation/disposition/concession", body:"<p>These terms mean any method authorized by the Act for acquiring, leasing, using, or benefiting from public domain land other than timber or mineral land.</p>"}
+  ]
+},
+{
+  heading:"Title II — Agricultural Public Lands: The Four Modes",
+  tag:"Secs. 11–57",
+  sections:[
+    {num:"Sec. 11", title:"The exclusive list of disposition modes", body:"<p>Agricultural public land can be disposed of ONLY as follows: <span class='kw'>(1) homestead settlement; (2) sale; (3) lease; (4) confirmation of imperfect/incomplete titles</span> — either (a) judicial legalization or (b) administrative legalization (free patent).</p>", trap:"\u201cOnly as follows, and not otherwise\u201d — this is an EXCLUSIVE list. No other method of acquiring agricultural public land exists outside these four (well, five counting the judicial/administrative split of the fourth)."},
+    {num:"Secs. 12–21", title:"Chapter III — Homestead", body:"<p>A citizen ≥18 years old (or head of family) who owns <span class='kw'>no more than 24 hectares</span> may enter a homestead of up to <span class='kw'>24 hectares</span>. Must begin working the land within <span class='kw'>6 months</span> of approval; must cultivate at least <span class='kw'>1/5</span> of the land within a period of 1–5 years before a patent issues. <span class='kw'>Only ONE homestead entry allowed per person, for life</span> (narrow exception: a prior grantee of less than 24 ha may apply for the remaining balance only).</p>", trap:"24 hectares is homestead's number — don't confuse it with free patent's 12-hectare cap (Sec. 44) or sale/lease's 144/1,024-hectare caps (Secs. 22, 33)."},
+    {num:"Secs. 22–32", title:"Chapter IV — Sale", body:"<p>Any citizen, or a corporation/association ≥60% Filipino-owned, may PURCHASE (via public bidding) agricultural public land up to <span class='kw'>144 hectares for an individual</span> or <span class='kw'>1,024 hectares for a corporation/association</span> (partnerships: 144 ha per member, capped at the 1,024 ha total). Must cultivate ≥1/5 within 5 years. <span class='kw'>After title is granted, a 10-year non-alienation restriction applies</span> (Sec. 29) — conveyance within that period is null and void, forfeiting the land back to the State.</p>", trap:"Sale's restriction period is 10 YEARS (Sec. 29) — a completely different number from free patent/homestead's 5-year restriction under Sec. 118. Two different modes, two different lock-in periods."},
+    {num:"Secs. 33–43", title:"Chapter V — Lease", body:"<p>Citizens or 60%-Filipino corporations may lease agricultural public land up to <span class='kw'>1,024 hectares</span> (up to <span class='kw'>2,000 hectares</span> if devoted to grazing). Term: <span class='kw'>not more than 25 years, renewable once for another 25 years</span> (50 years total) if the lessee made improvements justifying renewal. Annual rental: ≥3% of appraised value generally (≥4% for reclaimed land, ≥2% for grazing land). The lessee has the OPTION to purchase the leased land during the lease term, subject to Sale-chapter restrictions.</p>", trap:"This 25+25=50-year lease structure is the direct ancestor of Article XII, Sec. 3's own \u201c≤25 years, renewable for ≤25 more\u201d rule for corporate leases of public agricultural land — but it has NOTHING to do with RA 7652/RA 12252's up-to-99-year lease of PRIVATE land to FOREIGN investors. Don't conflate a public-domain agricultural lease with a private-land investor lease."},
+    {num:"Secs. 44–46", title:"Chapter VI — Free Patent (Agricultural)", body:"<p>A natural-born citizen owning <span class='kw'>no more than 12 hectares</span> who has continuously occupied/cultivated agricultural public land is entitled to a free patent for up to 12 hectares. The required possession period and filing deadlines have been amended multiple times — see the Related Laws tab for the current 20-year rule under RA 11573.</p>", trap:"Free patent's ownership ceiling is 12 hectares — HALF of homestead's 24-hectare ceiling. A very common numeric swap."},
+    {num:"Secs. 47–57", title:"Chapter VII — Judicial Confirmation of Imperfect Titles", body:"<p>Citizens occupying/claiming public domain land with imperfect/incomplete titles may apply to the (now Regional Trial) Court for confirmation and issuance of a Torrens certificate. Historically required <span class='kw'>30 years</span> of open, continuous, exclusive, notorious (OCEN) possession — later fixed to <span class='kw'>\u201csince June 12, 1945\u201d</span> by PD 1073 (1977), then changed again to a rolling <span class='kw'>20-year</span> requirement by RA 11573 (2021). No title to public land may ever be acquired merely by prescription/adverse possession outside this statutory framework (Sec. 57).</p>"}
+  ]
+},
+{
+  heading:"Titles III–V — Residential/Commercial Lands, Educational Grants &amp; Reservations",
+  tag:"Secs. 58–88",
+  sections:[
+    {num:"Secs. 58–68", title:"Chapter VIII — Residential, Commercial &amp; Industrial Lands", body:"<p>Non-agricultural A&amp;D land (reclaimed land, foreshore, marshy land bordering navigable waters, or other lands) may be LEASED OR SOLD — generally capped at <span class='kw'>144 hectares</span> — to persons/entities otherwise qualified to acquire agricultural public land. Reclaimed/foreshore/marshy land may ONLY be leased, never sold outright, until declared no longer needed for public service. Not more than <span class='kw'>2 residential lots and 2 commercial/industrial lots</span> per town site may be sold to any one person without special DENR Secretary approval.</p>"},
+    {num:"Secs. 69–70", title:"Chapter IX — Educational, Charitable &amp; Similar Purposes", body:"<p>Public land may be sold/leased/donated for founding a cemetery, church, college, school, university, or similar institution — capped at <span class='kw'>96 hectares</span> in any case, with speculation-prevention conditions attached.</p>"},
+    {num:"Secs. 71–88", title:"Chapters X–XII — Town Sites &amp; Reservations", body:"<p>Governs how the government formally establishes new town sites (survey, subdivision plat, public-auction sale of residential/commercial lots) and reserves land for public/quasi-public purposes, including special reservations for indigenous communities (using CA 141's own outdated 1936 terminology, \u201cnon-Christian Filipinos\u201d — since superseded conceptually by IPRA). Reserved lands (Sec. 88) are non-alienable and cannot be occupied, entered, sold, or leased until formally re-opened.</p>"}
+  ]
+},
+{
+  heading:"Title VI — General Provisions, Restrictions &amp; Penalties",
+  tag:"Secs. 89–136",
+  sections:[
+    {num:"Secs. 89–104", title:"Chapter XIII — Application Procedure &amp; Restrictions", body:"<p>All applications are sworn, addressed to the Director of Lands (now DENR/LMB), and must truthfully state qualifications, purpose, and land description — false statements void the resulting grant. Sec. 92 embodies the Act's underlying spirit: <span class='kw'>the true measure of how much land to grant is BENEFICIAL USE</span>, not simply the statutory maximum.</p>"},
+    {num:"Sec. 107", title:"Signing authority for patents", body:"<p>Patents/certificates are issued in the name of the Republic. Historically, signing authority was delegated by area: the President (or delegate) for larger tracts, and DISTRICT LAND OFFICERS for tracts ≤5 hectares — the direct ancestor of today's CENRO/PENRO area-based routing rules under RA 11573.</p>"},
+    {num:"Secs. 108–117", title:"Servitudes, Mineral Reservation &amp; Water Rights", body:"<p>No grant may injuriously affect adjacent land/waters/roads (Sec. 109). ALL patents are subject to a <span class='kw'>permanent State reservation of minerals</span> — gold, silver, copper, iron, coal, and similar substances NEVER pass to the grantee regardless of the patent issued (Sec. 110). Grants remain subject to a right-of-way up to <span class='kw'>60 meters wide</span> for public highways/utilities (Sec. 112), and to State regulation of water use (Sec. 113).</p>", trap:"Sec. 110's mineral reservation means a surface land patent NEVER includes subsurface mineral rights — the Regalian Doctrine's natural-resource ownership principle (Art. XII, Sec. 2) operates even on privately-patented land."},
+    {num:"Secs. 118–125", title:"Chapter XII (of Title VI) — Restrictions on Alienation", body:"<p><span class='kw'>Sec. 118:</span> homestead/free-patent land cannot be encumbered or alienated for <span class='kw'>5 years</span> from patent issuance (except to the Government), nor made liable for debts contracted during that period. <span class='kw'>Sec. 119:</span> the grantee, widow, or heirs may REPURCHASE conveyed land within <span class='kw'>5 years</span> from the conveyance. <span class='kw'>Sec. 121:</span> corporations/partnerships historically could NOT acquire any right to free-patent/homestead land, except for narrow purposes (commercial, industrial, educational, religious, charitable, or right-of-way) with DENR Secretary approval. <span class='kw'>Sec. 122–123:</span> except by hereditary succession, such land can only be transferred to persons/entities themselves qualified to acquire public land.</p>", trap:"These Sec. 118/119/121 restrictions have since been LIFTED for agricultural free patents by RA 11231 (2019) and for residential free patents by RA 10023's own Sec. 5 — but the ORIGINAL text of CA 141 itself still shows these restrictions, and they still apply in full to HOMESTEAD and SALES patents, which neither amendment touched."},
+    {num:"Secs. 129–133", title:"Chapter XV — Penal Provisions", body:"<p>False application/evidence = perjury. Maliciously obstructing another's land application = coercion. Illegally acquiring land through deceit/fraud: fine up to <span class='kw'>₱5,000</span> or imprisonment up to <span class='kw'>5 years</span>, or both.</p>"},
+    {num:"Secs. 134–136", title:"Chapter XVI — Final Provisions", body:"<p>Separability clause; repeal of inconsistent prior laws; effectivity <span class='kw'>December 1, 1936</span> unless the President proclaimed an earlier date. Approved <span class='kw'>November 7, 1936</span>.</p>"}
+  ]
+}
+];
+
+/* ---------- Modes of Disposition — deep dive ---------- */
+const modesArticles = [
+{
+  heading:"The Five Ways to Acquire Public Agricultural Land",
+  tag:"Sec. 11 in practice",
+  sections:[
+    {num:"1. Homestead", title:"Settle it yourself, earn it through cultivation", body:"<p><b>Who:</b> Filipino citizen ≥18 y.o. or head of family, owning ≤24 ha.<br><b>How much:</b> up to <span class='kw'>24 hectares</span>.<br><b>Core requirement:</b> begin working within 6 months; cultivate ≥1/5 within 1–5 years.<br><b>Restriction after title:</b> 5-year non-alienation (Sec. 118).<br><b>Limit:</b> one homestead per person, ever.</p>"},
+    {num:"2. Sale", title:"Buy it at public auction", body:"<p><b>Who:</b> any citizen, or a 60%-Filipino corporation/association/partnership.<br><b>How much:</b> up to <span class='kw'>144 ha</span> (individual) or <span class='kw'>1,024 ha</span> (corporation/association).<br><b>Core requirement:</b> public bidding, cultivate ≥1/5 within 5 years, pay purchase price (cash or ≤10 annual installments).<br><b>Restriction after title:</b> 10-year non-alienation (Sec. 29) — a LONGER lock-in than homestead's.</p>"},
+    {num:"3. Lease", title:"Rent it long-term, with an option to buy", body:"<p><b>Who:</b> citizens or 60%-Filipino corporations.<br><b>How much:</b> up to <span class='kw'>1,024 ha</span> (up to <span class='kw'>2,000 ha</span> for grazing).<br><b>Term:</b> ≤25 years, renewable ONCE for ≤25 more (50 years total).<br><b>Rental:</b> ≥3% of appraised value/year (≥4% reclaimed land, ≥2% grazing).<br><b>Bonus:</b> lessee may exercise an option to purchase during the lease.</p>"},
+    {num:"4a. Free Patent (Administrative)", title:"No court needed — DENR grants it directly", body:"<p><b>Who:</b> natural-born citizen owning ≤12 ha (agricultural) or any Filipino citizen actual occupant (residential, under RA 10023).<br><b>How much:</b> up to <span class='kw'>12 ha</span> (agricultural) or <span class='kw'>200–1,000 sqm</span> tiered by city/municipality classification (residential).<br><b>Possession required:</b> currently <span class='kw'>20 years</span> immediately preceding filing (agricultural, per RA 11573) or <span class='kw'>10 years</span> (residential, per RA 10023).<br><b>Where filed:</b> CENRO, routed by area to PENRO / DENR Regional Director / DENR Secretary.</p>"},
+    {num:"4b. Judicial Confirmation of Imperfect Title", title:"Court-supervised confirmation, no area cap", body:"<p><b>Who:</b> any citizen/claimant with an imperfect/incomplete title to A&amp;D public land.<br><b>How much:</b> NO statutory area ceiling (unlike free patent's fixed hectare caps).<br><b>Possession required:</b> currently <span class='kw'>20 years</span> OCEN possession immediately preceding filing (per RA 11573; previously \u201csince June 12, 1945\u201d under PD 1073).<br><b>Where filed:</b> the Regional Trial Court (not an administrative agency) of the province where the land is located.</p>", trap:"Free patent (administrative, DENR-issued) and judicial confirmation (court-issued) both now use the SAME 20-year figure post-RA 11573 — but they remain two legally distinct processes, one administrative and one judicial, with judicial confirmation having no fixed area ceiling."}
+  ]
+},
+{
+  heading:"Side-by-Side: The Numbers That Get Swapped",
+  tag:"Quick-reference table, in prose",
+  sections:[
+    {num:"Area caps", title:"24 (homestead) vs. 144/1,024 (sale) vs. 1,024/2,000 (lease) vs. 12 (free patent)", body:"<p>Homestead: 24 ha. Sale: 144 ha (individual) / 1,024 ha (corporation). Lease: 1,024 ha (2,000 ha if grazing). Agricultural free patent: 12 ha. Residential free patent: 200–1,000 sqm depending on city classification. Judicial confirmation: no area cap at all.</p>"},
+    {num:"Restriction periods", title:"5 years (homestead/free patent) vs. 10 years (sale) vs. 5 years (repurchase right, any mode)", body:"<p>Sec. 118's non-alienation restriction: 5 years, applies to homestead and (originally) free patent. Sec. 29's sale restriction: 10 years — longer. Sec. 119's repurchase right: 5 years from conveyance, available across modes where the underlying restriction still applies.</p>"},
+    {num:"Possession periods", title:"30 → June 12, 1945 → 20 years (two separate historical tracks)", body:"<p>Free patent (Sec. 44) possession requirement: originally fixed to July 4, 1926 or earlier (1936) → rolling ~30 years per RA 6940 (1990) → 20 years immediately preceding filing per RA 11573 (2021). Judicial confirmation (Sec. 48-b) possession requirement: originally rolling 30 years (1936) → fixed \u201csince June 12, 1945\u201d per PD 1073 (1977) → 20 years immediately preceding filing per RA 11573 (2021). These are TWO SEPARATE numeric histories for two different provisions — track them independently.</p>"}
+  ]
+}
+];
+
+/* ---------- Related Laws ---------- */
+const relatedArticles = [
+{
+  heading:"Older Amendments &amp; Alternate Mechanisms",
+  tag:"RA 730 · BP 223 · RA 6940 · RA 9176",
+  sections:[
+    {num:"RA 730 (1952)", title:"Sale of public land without auction, for residential purposes", body:"<p>Signed <span class='kw'>June 18, 1952</span>. Lets an ACTUAL OCCUPANT who has already built a house on public land BUY it — up to <span class='kw'>1,000 sqm</span> — WITHOUT the usual public-bidding process otherwise required for sales under CA 141 Chapter IV. This is a SALE (the buyer pays), legally distinct from a free patent (a gratuitous grant).</p>", trap:"RA 730 (a sale mechanism) and RA 10023 (a free-patent mechanism) both cover residential lots of similar scale, but they are legally different dispositions — RA 730 requires PAYMENT; RA 10023's free patent does not."},
+    {num:"BP 223 (1982)", title:"The direct predecessor of RA 10023", body:"<p>Full title: \u201cAn Act to Hasten Titling of Residential Lands of the Public Domain by Authorizing the Grant of Free Patent Under Certain Conditions.\u201d Signed <span class='kw'>April 16, 1982</span> — nearly three decades BEFORE RA 10023. Established the first free-patent (not sale) mechanism specifically for residential public land, with expedited cadastral/judicial proceedings. RA 10023 effectively modernized and replaced this framework in 2010, adding the tiered 200/500/750/1,000 sqm area limits and cutting the occupancy requirement to 10 years.</p>", trap:"Don't credit RA 10023 as the FIRST residential free-patent law — that distinction belongs to BP 223 (1982). RA 10023 is better understood as BP 223's successor/modernization, not an entirely new invention."},
+    {num:"RA 6940 (Mar. 28, 1990)", title:"First major reform of the free-patent possession rule", body:"<p>Signed by President <span class='kw'>Corazon C. Aquino</span> (finally passed by the Senate Oct. 5, 1989 and the House Jan. 24, 1990). Amended Sec. 44 to require at least <span class='kw'>30 years</span> of continuous occupation/cultivation counted back from THIS LAW'S OWN March 28, 1990 effectivity — replacing the original 1936 fixed cutoff of July 4, 1926. Also amended Sec. 47 to extend the filing deadline for free-patent and judicial-confirmation applications (capped at 12 hectares) to <span class='kw'>December 31, 2000</span>.</p>", trap:"RA 6940 was signed by Cory Aquino in 1990 — a full 20 years before RA 10023 (GMA, 2010) and nearly 30 years before RA 11231 (Duterte, 2019). Three different presidents, three different free-patent reforms — don't mix up who signed which."},
+    {num:"RA 9176 (Nov. 13, 2002)", title:"The Public Land Act's last deadline extension", body:"<p>Signed by President <span class='kw'>Gloria Macapagal-Arroyo</span> (a consolidation of House Bill No. 4628 and Senate Bill No. 1695, passed Sept. 2–3, 2002). Further extended the Sec. 45/47 filing deadline for free-patent and judicial-confirmation applications (still capped at 12 hectares) to <span class='kw'>December 31, 2020</span> — the LAST such statutory sunset date before RA 11573 abolished deadlines altogether in 2021. Its own IRR, <span class='kw'>DENR Administrative Order No. 36-02</span> (Dec. 9, 2002), rolled applications into the DENR's <span class='kw'>\u201cHandog Titulo\u201d</span> Program — a branding that recurs in later DENR-LGU titling issuances too.</p>"}
+  ]
+},
+{
+  heading:"Modern Free-Patent Reforms",
+  tag:"RA 10023 · RA 11231",
+  sections:[
+    {num:"RA 10023 (2010)", title:"Residential Free Patent Act", body:"<p>Extends the free-patent MECHANISM (previously agricultural-only) to RESIDENTIAL public land. <b>Qualification:</b> any Filipino citizen who is an actual occupant. <b>Occupancy required:</b> just <span class='kw'>10 years</span> — far shorter than agricultural free patent's requirement. <b>Area limits, tiered by locality:</b> <span class='kw'>200 sqm</span> in highly urbanized cities; <span class='kw'>500 sqm</span> in other cities; <span class='kw'>750 sqm</span> in 1st/2nd class municipalities; <span class='kw'>1,000 sqm</span> in all other municipalities. <b>No restrictions:</b> Sec. 5 itself removes CA 141's Secs. 118, 119, 121, 122, and 123 restrictions entirely for these patents. <b>Process:</b> filed at CENRO (120-day processing), forwarded to PENRO (5 days to approve/disapprove).</p>", trap:"RA 10023's 10-year occupancy requirement is much SHORTER than the 20-year rule that (post-RA 11573) applies to AGRICULTURAL free patents — don't assume the two free-patent tracks share the same possession period."},
+    {num:"RA 11231 (2019)", title:"Agricultural Free Patent Reform Act", body:"<p>Formal title: \u201cAn Act Removing the Restrictions Imposed on the Registration, Acquisition, Encumbrance, Alienation, Transfer and Conveyance of Land Covered by Free Patents under Sections 118, 119 and 121 of CA 141.\u201d Makes an agricultural free patent a <span class='kw'>title in fee simple</span>, free of the old 5-year non-alienation restriction (Sec. 118) and the old corporate-acquisition ban (Sec. 121) — <span class='kw'>applied RETROACTIVELY</span> to patents already issued before the law took effect. The Sec. 119 repurchase right is preserved only for good-faith transactions made BEFORE this Act's effectivity.</p>", trap:"RA 11231 is specifically about AGRICULTURAL free patents (Sec. 44) — it does NOT touch homestead or sales-patent restrictions, which remain governed by the original Secs. 118/29 as written."}
+  ]
+},
+{
+  heading:"RA 11573 (2021) — The Current Governing Law",
+  tag:"Plus its IRR, DAO 2021-38",
+  sections:[
+    {num:"RA 11573", title:"An Act Improving the Confirmation Process for Imperfect Land Titles", body:"<p>Signed <span class='kw'>July 16, 2021</span> by President Rodrigo Duterte; amends both CA 141 and PD 1529 (Property Registration Decree). Key changes: <b>(1)</b> Free patent (Sec. 44) possession requirement cut to <span class='kw'>20 years</span> immediately preceding filing (from ~30 years). <b>(2)</b> Judicial confirmation (Sec. 48-b) possession requirement changed from \u201csince June 12, 1945\u201d to the SAME <span class='kw'>20-year</span> rolling rule. <b>(3)</b> ABOLISHES the filing deadline entirely — no more December 31 sunset date. <b>(4)</b> Free-patent applications are routed by area: <span class='kw'>&lt;5 ha to PENRO; 5–10 ha to the DENR Regional Director; &gt;10–12 ha to the DENR Secretary</span> — each must approve/disapprove within <span class='kw'>5 days</span> of the CENRO's recommendation. <b>(5)</b> A DENR GEODETIC ENGINEER's certification is now sufficient proof that land is alienable and disposable for judicial confirmation — replacing the old requirement of the DENR SECRETARY's own signature. <b>(6)</b> Allows barangay certification to substitute for the traditional 2-witness requirement. <b>(7)</b> The Land Registration Authority (LRA) may accept DENR-approved free patents as evidence in judicial Sec. 14 (PD 1529) applications.</p>", trap:"RA 11573 changed TWO separate possession-period histories to the SAME 20-year figure — but free patent and judicial confirmation remain legally distinct tracks (administrative vs. judicial) even though the numbers now match."},
+    {num:"DAO 2021-38", title:"IRR of RA 11573", body:"<p>Issued by the DENR within the <span class='kw'>60-day</span> window RA 11573's own Sec. 10 required. Details the procedure for the <b>Alienable and Disposable Agricultural Land Certification</b> — including how it's imprinted on the approved survey plan, and a fallback procedure (sworn statement + NAMRIA records check) when the original land-classification issuance can't be located. Confirms that free patents issued under RA 11573 carry NO restriction on sale or encumbrance, and that old restrictive language printed on older official forms is to be treated as not written.</p>"},
+    {num:"DAO 2011-06", title:"DENR-LGU public land titling partnership guidelines", body:"<p>Full title: \u201cPrescribing the Guidelines for the Implementation of Public Land Titling in Partnership with Local Government Units.\u201d Issued <span class='kw'>May 23, 2011</span> under DENR Secretary <span class='kw'>Ramon J.P. Paje</span>, supported by DILG Memorandum Circular 2011-07. <b>How it works:</b> an LGU must first pass a local ORDINANCE creating a titling office/program — this is the prerequisite before DENR assistance kicks in. DENR Regional Executive Directors then <span class='kw'>deputize qualified LGU officials as Deputy Public Land Inspectors (DPLIs)</span>, who join a composite Land Adjudication Team alongside a DENR Land Management Officer (LMO). An advisory <span class='kw'>Cadastral Council</span> (LGU + DENR + other stakeholders) may also be formed to guide implementation and post-titling asset management. Crucially, <span class='kw'>DENR field offices retain final approval and signing authority</span> in every phase EXCEPT the specific tasks delegated to deputized LGU officials — the LGU assists and accelerates, but doesn't replace DENR's authority. This framework directly complements <span class='kw'>RA 10023</span> and was later reinforced by DAO 2019-08 (2019), which pushed titling assistance all the way down to the barangay level and folded everything into the same \u201cHandog Titulo\u201d branding used since RA 9176's own 2002 IRR.</p>", trap:"DAO 2011-06 doesn't transfer DENR's authority to LGUs — it DEPUTIZES specific LGU officials for specific tasks (as DPLIs) while DENR retains final approval/signing power throughout. A common misreading is to assume LGUs can independently issue titles under this order — they cannot."}
+  ]
+}
+];
+
+/* ---------- Board Exam Traps ---------- */
+const traps = [
+  {t:"Homestead's 24 ha vs. Free Patent's 12 ha", b:"Homestead (Sec. 12): up to 24 hectares. Agricultural free patent (Sec. 44): up to only 12 hectares — exactly half. A very common numeric swap."},
+  {t:"Sale's area caps: 144 ha individual, 1,024 ha corporation", b:"An individual may purchase up to 144 hectares; a 60%-Filipino corporation/association up to 1,024 hectares (partnerships: 144 ha per member, capped at the 1,024 ha total)."},
+  {t:"Lease caps: 1,024 ha general, 2,000 ha for grazing", b:"The general lease ceiling is 1,024 hectares, but land devoted to grazing purposes may be leased up to 2,000 hectares — a special, larger exception."},
+  {t:"Lease term: 25 + 25 = 50 years (public domain) vs. up to 99 years (RA 7652/12252, private land)", b:"CA 141's lease of PUBLIC agricultural land tops out at 50 years total (25+25). This has nothing to do with RA 7652 as amended by RA 12252's up-to-99-year lease, which covers PRIVATE land leased to FOREIGN investors — different land, different lessees, different law entirely."},
+  {t:"Restriction periods: 5 years (homestead/free patent, Sec. 118) vs. 10 years (sale, Sec. 29)", b:"Land acquired via homestead or (originally) free patent can't be alienated for 5 years after patent issuance. Land acquired via SALE carries a longer 10-year restriction instead — two different modes, two different lock-in periods."},
+  {t:"RA 11231 only touches AGRICULTURAL free patents", b:"It removes the Sec. 118/119/121 restrictions specifically for agricultural free patents under Sec. 44 — it does NOT affect homestead patents or sales patents, which remain governed by their own original restriction periods."},
+  {t:"RA 10023 removes its own restrictions via its own Sec. 5", b:"Residential free patents under RA 10023 are unrestricted from the start (Sec. 5 of RA 10023 itself lifts CA 141 Secs. 118/119/121/122/123) — this is a separate legal basis from RA 11231's later, agricultural-specific removal."},
+  {t:"Two separate possession-period histories — don't merge them", b:"Free patent (Sec. 44): 1936 fixed date (July 4, 1926) → RA 6940 (1990) rolling ~30 years → RA 11573 (2021) rolling 20 years. Judicial confirmation (Sec. 48-b): 1936 rolling 30 years → PD 1073 (1977) fixed \u201csince June 12, 1945\u201d → RA 11573 (2021) rolling 20 years. Same eventual number (20 years), completely different histories."},
+  {t:"RA 11573 abolished the filing deadline entirely", b:"Previously RA 9176 set a December 31, 2020 sunset date for free-patent and judicial-confirmation applications. RA 11573 (2021) removed this deadline altogether — there is currently no cutoff date for filing."},
+  {t:"DENR geodetic engineer certification now suffices for A&D proof", b:"Before RA 11573, judicial confirmation applicants needed the DENR SECRETARY's own signature certifying alienable-and-disposable status — a heavy burden. RA 11573 allows a DULY DESIGNATED DENR GEODETIC ENGINEER's certification instead, imprinted on the survey plan."},
+  {t:"Area-based routing for free-patent approval", b:"Under RA 11573: below 5 hectares routes to the PENRO; 5 up to 10 hectares to the DENR Regional Director; more than 10 up to 12 hectares to the DENR Secretary — three different approving authorities, each with a 5-day decision window."},
+  {t:"RA 730 is a SALE, not a free patent", b:"RA 730 lets an actual occupant BUY (without public auction) up to 1,000 sqm of residential public land they've already built on. RA 10023's free patent, by contrast, is a GRATUITOUS grant requiring no payment — legally distinct mechanisms covering similar-sized residential lots."},
+  {t:"RA 10023's area tiers depend on LOCALITY CLASSIFICATION, not urban/rural status", b:"200 sqm (highly urbanized cities), 500 sqm (other cities), 750 sqm (1st/2nd class municipalities), 1,000 sqm (all other municipalities) — this tiering is DIFFERENT from BP 185/RA 8179's simple urban-vs-rural split for former-Filipino land acquisition under Article XII."},
+  {t:"Corporations were historically BARRED from free patents until RA 11231", b:"Sec. 121 of CA 141 originally barred corporations/partnerships from acquiring free-patent/homestead land except for narrow, DENR-Secretary-approved purposes. RA 11231 (2019) lifted this bar specifically for AGRICULTURAL free patents — a significant, relatively recent departure from decades of corporate exclusion."},
+  {t:"Mineral rights never pass with a surface patent (Sec. 110)", b:"Gold, silver, copper, iron, coal, and similar substances always remain State property, regardless of what land patent is issued — a direct application of the Regalian Doctrine even to privately-patented land."},
+  {t:"Only ONE homestead per person, for life (Sec. 19)", b:"A person who already received a homestead patent — regardless of its area — cannot apply for another, except a narrow exception for prior grantees of less than 24 hectares, who may apply only for the remaining balance up to 24 ha total."},
+  {t:"Reversion suits are filed by the Solicitor General, not private parties", b:"Sec. 101 vests the power to sue for reversion of improperly-acquired public land exclusively in the Solicitor General, acting in the name of the Republic — a private complainant cannot independently bring a reversion action."},
+  {t:"\u201cNational cultural minorities\u201d is CA 141's own outdated 1936 terminology", b:"CA 141's original text still uses \u201cnon-Christian Filipinos\u201d/\u201cnational cultural minorities\u201d — concepts formally superseded (though not textually replaced within CA 141 itself) by IPRA's 1997 recognition of Indigenous Cultural Communities/Indigenous Peoples."},
+  {t:"Judicial confirmation has NO fixed area ceiling", b:"Unlike homestead (24 ha), sale (144/1,024 ha), or free patent (12 ha), judicial confirmation of imperfect title under Sec. 48(b) carries no statutory maximum area — a key distinguishing feature of the judicial track."},
+  {t:"DENR postdates CA 141 by over 50 years", b:"CA 141 (1936) originally named the Secretary of Agriculture and Commerce as administering official — the DENR itself wasn't created until 1987 (EO 192). References to 'the Secretary' in CA 141's own unamended text functionally mean today's DENR Secretary, but the two offices are historically distinct."},
+  {t:"BP 223 (1982), not RA 10023, was the FIRST residential free-patent law", b:"RA 10023 (2010) modernized and replaced BP 223's framework — it didn't invent the residential free-patent concept. Three decades separate the two laws."},
+  {t:"Three different presidents signed three different free-patent reforms", b:"RA 6940 (1990) — Corazon Aquino. RA 10023 (2010) — Gloria Macapagal-Arroyo (who also signed RA 9176 in 2002). RA 11231 (2019) and RA 11573 (2021) — Rodrigo Duterte. Don't mix up who signed which law."},
+  {t:"DAO 2011-06 deputizes LGU officials — it doesn't transfer DENR's authority", b:"LGU officials become Deputy Public Land Inspectors (DPLIs) for SPECIFIC delegated tasks, working alongside a DENR Land Management Officer. DENR field offices keep final approval/signing authority throughout — an LGU cannot independently issue a public land title under this order."},
+  {t:"An LGU ordinance is the prerequisite for DAO 2011-06 partnership", b:"An LGU must first pass a local ordinance creating its own titling office/program before DENR will deputize its officials and begin the partnership — DENR doesn't unilaterally impose the arrangement."},
+  {t:"\u201cHandog Titulo\u201d branding spans multiple, separate issuances", b:"The name recurs across RA 9176's IRR (DAO 36-02, 2002), the DENR-LGU partnership guidelines (DAO 2011-06, 2011), and their barangay-level reinforcement (DAO 2019-08, 2019) — it's a recurring PUBLIC PROGRAM NAME, not the title of any single law or issuance."}
+];
+
+/* ---------- Quiz ---------- */
+const quiz = [
+  {q:"Under CA 141 Sec. 11, agricultural public land can be disposed of through how many distinct modes?",
+   opts:["Two", "Three", "Four (homestead, sale, lease, confirmation of imperfect title)", "Six"], a:2,
+   ex:"Homestead, sale, lease, and confirmation of imperfect/incomplete title (itself split into judicial and administrative/free-patent legalization) — an EXCLUSIVE list."},
+  {q:"The maximum area obtainable through a homestead under CA 141 is:",
+   opts:["12 hectares", "24 hectares", "144 hectares", "1,024 hectares"], a:1,
+   ex:"Sec. 12 — up to 24 hectares, for a citizen ≥18 years old or head of family who owns no more than 24 hectares already."},
+  {q:"An individual citizen may purchase public agricultural land (Sale, Chapter IV) up to:",
+   opts:["24 hectares", "144 hectares", "1,024 hectares", "2,000 hectares"], a:1,
+   ex:"Sec. 22 — up to 144 hectares for an individual; a 60%-Filipino corporation/association may purchase up to 1,024 hectares."},
+  {q:"Under CA 141 Chapter V, the maximum lease term for public agricultural land (with one renewal) is:",
+   opts:["25 years total", "50 years total (25 + 25)", "75 years total (50 + 25)", "99 years total"], a:1,
+   ex:"Sec. 38 — leases run up to 25 years, renewable once for another 25 years, for a 50-year maximum. Don't confuse this with RA 7652/RA 12252's up-to-99-year PRIVATE land lease for foreign investors."},
+  {q:"The maximum area obtainable through an agricultural free patent (Sec. 44) is:",
+   opts:["12 hectares", "24 hectares", "144 hectares", "500 hectares"], a:0,
+   ex:"12 hectares — half of homestead's 24-hectare ceiling."},
+  {q:"Under RA 11573 (2021), the possession period now required for BOTH agricultural free patent and judicial confirmation of imperfect title is:",
+   opts:["10 years", "20 years immediately preceding the application", "30 years", "Possession since June 12, 1945"], a:1,
+   ex:"RA 11573 unified both tracks to a rolling 20-year requirement, replacing the old 30-year (free patent) and 'since June 12, 1945' (judicial confirmation) standards."},
+  {q:"Before RA 11573, the fixed historical baseline for judicial confirmation of imperfect title was possession since:",
+   opts:["July 4, 1926", "June 12, 1945", "December 31, 1987", "January 1, 1936"], a:1,
+   ex:"PD 1073 (1977) fixed this baseline at June 12, 1945 — later replaced by RA 11573's rolling 20-year rule in 2021."},
+  {q:"Which law removed the corporate ownership ban and the 5-year non-alienation restriction specifically for AGRICULTURAL free patents?",
+   opts:["RA 10023", "RA 11231", "RA 6940", "RA 730"], a:1,
+   ex:"RA 11231 (2019), the Agricultural Free Patent Reform Act, retroactively lifted CA 141 Secs. 118, 119, and 121 restrictions for agricultural free patents specifically."},
+  {q:"Under RA 10023, the maximum residential free-patent area in a highly urbanized city is:",
+   opts:["200 sqm", "500 sqm", "750 sqm", "1,000 sqm"], a:0,
+   ex:"200 sqm in highly urbanized cities; 500 sqm in other cities; 750 sqm in 1st/2nd class municipalities; 1,000 sqm in all other municipalities."},
+  {q:"How many years of occupancy does RA 10023 require for a residential free patent?",
+   opts:["5 years", "10 years", "20 years", "30 years"], a:1,
+   ex:"10 years — much shorter than the (post-RA 11573) 20-year rule for agricultural free patents."},
+  {q:"RA 730 (1952) allows an actual occupant to acquire up to 1,000 sqm of residential public land through:",
+   opts:["A free patent, at no cost", "A sale without public auction", "Hereditary succession", "A 25-year lease"], a:1,
+   ex:"RA 730 is a SALE mechanism (the occupant pays), conducted without the usual public bidding — legally distinct from RA 10023's later gratuitous free-patent grant."},
+  {q:"Under RA 11573, a free-patent application covering 8 hectares of agricultural land would be routed for approval to the:",
+   opts:["CENRO directly", "PENRO", "DENR Regional Director", "DENR Secretary"], a:2,
+   ex:"Area-based routing: <5 ha → PENRO; 5–10 ha → DENR Regional Director; >10–12 ha → DENR Secretary. 8 hectares falls in the 5–10 ha bracket."},
+  {q:"Under RA 11573, proof that land is alienable and disposable for judicial confirmation purposes may now be established by:",
+   opts:["Only the DENR Secretary's personal signature", "A certification from a duly designated DENR geodetic engineer", "A barangay captain's affidavit alone", "No certification is required at all"], a:1,
+   ex:"RA 11573 simplified this — a DENR geodetic engineer's certification, imprinted on the approved survey plan, now suffices; the old DENR Secretary signature requirement is gone."},
+  {q:"CA 141's Sec. 110 provides that patents issued under the Act:",
+   opts:["Include full mineral rights", "Never include gold, silver, copper, coal, or similar mineral rights", "Include mineral rights only for areas under 12 hectares", "Automatically transfer with any subsequent sale"], a:1,
+   ex:"Sec. 110 reserves all such minerals to the State permanently — a direct application of the Regalian Doctrine even on privately-patented land."},
+  {q:"How many homestead entries is a single person allowed under CA 141, as a general rule?",
+   opts:["One, for life", "Two, in different provinces", "Unlimited, if within the 24-hectare cap each time", "Three"], a:0,
+   ex:"Sec. 19 — only one homestead entry per person, ever (with a narrow exception for a prior grantee of less than 24 ha applying for the remaining balance)."},
+  {q:"Who has the authority to file a reversion suit for improperly-acquired public land?",
+   opts:["Any private citizen", "The barangay captain", "The Solicitor General, in the name of the Republic", "The DENR Secretary personally, without court action"], a:2,
+   ex:"Sec. 101 vests this power exclusively in the Solicitor General."},
+  {q:"Which of the following laws is the IRR of RA 11573?",
+   opts:["DAO 2011-06", "DAO 2021-38", "DAO 12-10", "Joint MC 2019-001"], a:1,
+   ex:"DENR Administrative Order No. 2021-38, issued within the 60-day window RA 11573's Sec. 10 required."},
+  {q:"Under CA 141, the non-alienation restriction period after a SALE patent (Sec. 29) is:",
+   opts:["5 years", "10 years", "15 years", "25 years"], a:1,
+   ex:"10 years — longer than the 5-year restriction that (originally) applied to homestead and free-patent land under Sec. 118."},
+  {q:"Commonwealth Act No. 141 was approved on:",
+   opts:["November 7, 1936", "December 1, 1936", "November 29, 1919", "June 18, 1952"], a:0,
+   ex:"Approved November 7, 1936, taking effect December 1, 1936 per its own Sec. 136 (unless the President proclaimed an earlier date)."},
+  {q:"Before RA 11573 (2021), the last statutory deadline for filing free-patent and judicial-confirmation applications was set by RA 9176 at:",
+   opts:["December 31, 1987", "December 31, 2000", "December 31, 2020", "There was never a deadline"], a:2,
+   ex:"RA 9176 (2002) extended the deadline to December 31, 2020 — the last such sunset date before RA 11573 abolished filing deadlines altogether."},
+  {q:"The direct predecessor of RA 10023 — the first law creating a residential free-patent mechanism — was:",
+   opts:["RA 730 (1952)", "BP 223 (1982)", "RA 6940 (1990)", "RA 9176 (2002)"], a:1,
+   ex:"Batas Pambansa Blg. 223, signed April 16, 1982, established the first residential free-patent framework — nearly three decades before RA 10023 modernized it in 2010."},
+  {q:"RA 6940, which set a ~30-year possession requirement for agricultural free patents, was signed in 1990 by:",
+   opts:["Ferdinand Marcos Sr.", "Corazon C. Aquino", "Fidel V. Ramos", "Gloria Macapagal-Arroyo"], a:1,
+   ex:"President Corazon C. Aquino signed RA 6940 on March 28, 1990 — a full two decades before RA 10023 (GMA, 2010) and nearly three before RA 11231 (Duterte, 2019)."},
+  {q:"Under DAO 2011-06, an LGU official assisting in public land adjudication as part of a DENR-LGU titling partnership is formally designated a:",
+   opts:["Municipal Assessor", "Deputy Public Land Inspector (DPLI)", "Regional Executive Director", "Land Registration Officer"], a:1,
+   ex:"DENR Regional Executive Directors deputize qualified LGU officials as DPLIs, who work alongside a DENR Land Management Officer — but DENR retains final approval and signing authority throughout."}
+];
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+const viewRoot = document.getElementById('viewRoot');
+const topbarTitle = document.getElementById('topbarTitle');
+let currentTab = 'home';
+let quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+function accordionHTML(articles){
+  return articles.map((art) => `
+    <div class="article-block">
+      <div class="article-heading"><span>${art.heading}</span><span class="tag">${art.tag}</span></div>
+      ${art.sections.map((s) => `
+        <div class="sec-card" data-search="${(s.title+' '+s.num+' '+s.body+(s.trap||'')).toLowerCase().replace(/"/g,'&quot;')}">
+          <button class="sec-head" onclick="toggleSec(this)">
+            <span class="sec-num">${s.num}</span>
+            <span class="sec-title">${s.title}</span>
+            <svg class="sec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="sec-body"><div class="sec-body-inner">
+            ${s.body}
+            ${s.trap ? `<div class="trap-box"><span class="lbl">TRAP</span><span>${s.trap}</span></div>` : ''}
+          </div></div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function toggleSec(btn){
+  const card = btn.closest('.sec-card');
+  const body = card.querySelector('.sec-body');
+  const isOpen = card.classList.contains('open');
+  if(isOpen){
+    card.classList.remove('open');
+    body.style.maxHeight = null;
+  } else {
+    card.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 40 + 'px';
+  }
+}
+
+function renderHome(){
+  topbarTitle.textContent = 'Overview';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Commonwealth Act No. 141 · 1936</span></div>
+      <h1 class="view-title">The Public Land Act — High Yield</h1>
+      <p class="view-sub">Covers REB General/Fundamentals and REA Land Management &amp; Real Property Laws — alienable and disposable lands, the four modes of acquiring public land, and judicial confirmation of imperfect title.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="n">136</div><div class="l">Sections in CA 141</div></div>
+      <div class="stat-card"><div class="n">4</div><div class="l">Exclusive modes of disposition (Sec. 11)</div></div>
+      <div class="stat-card"><div class="n">20 yrs</div><div class="l">Current possession rule, since RA 11573 (2021)</div></div>
+      <div class="stat-card"><div class="n">12 ha</div><div class="l">Agricultural free patent ceiling (Sec. 44)</div></div>
+    </div>
+
+    <div class="article-heading"><span>Timeline at a glance</span></div>
+    <div class="home-timeline">
+      ${timeline.map(t => `
+        <div class="tl-item">
+          <div class="tl-date">${t.date}</div>
+          <div class="tl-title">${t.title}</div>
+          <div class="tl-desc">${t.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="quicklinks">
+      <div class="qlink" onclick="switchTab('law')"><div class="qt">Read CA 141 →</div><div class="qd">Full text, condensed by Title/Chapter, with highlighted numbers &amp; traps.</div></div>
+      <div class="qlink" onclick="switchTab('modes')"><div class="qt">Modes of Disposition →</div><div class="qd">Homestead, sale, lease, free patent, and judicial confirmation — side by side.</div></div>
+      <div class="qlink" onclick="switchTab('related')"><div class="qt">Related Laws →</div><div class="qd">RA 730, RA 6940, RA 10023, RA 11231, RA 11573 and its IRR.</div></div>
+      <div class="qlink" onclick="switchTab('quiz')"><div class="qt">Take the Quiz →</div><div class="qd">20 self-test questions with instant explanations.</div></div>
+    </div>
+  `;
+}
+
+function renderLaw(){
+  topbarTitle.textContent = 'CA 141 — Full Text';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Commonwealth Act No. 141</span></div>
+      <h1 class="view-title">The Public Land Act, Title by Title</h1>
+      <p class="view-sub">Approved November 7, 1936 · Effective December 1, 1936 · 136 Sections across 6 Titles, condensed here by theme.</p>
+    </div>
+    <div id="lawSections">${accordionHTML(raArticles)}</div>
+  `;
+}
+
+function renderModes(){
+  topbarTitle.textContent = 'Modes of Disposition';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Deep-dive</span></div>
+      <h1 class="view-title">The Modes of Acquiring Public Land</h1>
+      <p class="view-sub">Homestead, sale, lease, free patent, and judicial confirmation — the operative, board-exam-ready synthesis with every area cap and restriction period side by side.</p>
+    </div>
+    <div id="modesSections">${accordionHTML(modesArticles)}</div>
+  `;
+}
+
+function renderRelated(){
+  topbarTitle.textContent = 'Related Laws';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Amendments &amp; implementing issuances</span></div>
+      <h1 class="view-title">The Statutes That Amended CA 141</h1>
+      <p class="view-sub">From a 1952 sale mechanism through the sweeping 2021 reform that governs land titling today.</p>
+    </div>
+    <div id="relatedSections">${accordionHTML(relatedArticles)}</div>
+  `;
+}
+
+function renderPeople(){
+  topbarTitle.textContent = 'Dates & People';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Who &amp; When</span></div>
+      <h1 class="view-title">Key Dates &amp; People</h1>
+      <p class="view-sub">Nearly a century of public land legislation, from the Commonwealth era to 2021.</p>
+    </div>
+    <div class="article-heading"><span>Full timeline</span></div>
+    <div class="home-timeline" style="margin-bottom:34px;">
+      ${timeline.map(t => `
+        <div class="tl-item" data-search="${(t.date+' '+t.title+' '+t.desc).toLowerCase().replace(/"/g,'&quot;')}">
+          <div class="tl-date">${t.date}</div>
+          <div class="tl-title">${t.title}</div>
+          <div class="tl-desc">${t.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="article-heading"><span>Key people &amp; institutions</span></div>
+    <div class="people-grid">
+      ${people.map(p => `
+        <div class="p-card" data-search="${(p.name+' '+p.role+' '+p.desc).toLowerCase().replace(/"/g,'&quot;')}">
+          <div class="p-name">${p.name}</div>
+          <div class="p-role">${p.role}</div>
+          <div class="p-desc">${p.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderGlossary(){
+  topbarTitle.textContent = 'Glossary';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Terms</span></div>
+      <h1 class="view-title">Glossary of Terms</h1>
+      <p class="view-sub">Definitions pulled from CA 141 and its amendments.</p>
+    </div>
+    <div class="glossary-grid">
+      ${glossary.map(g => `
+        <div class="g-card" data-search="${(g.term+' '+g.abbr+' '+g.def).toLowerCase().replace(/"/g,'&quot;')}">
+          <span class="g-term">${g.term}</span><span class="g-abbr">${g.abbr}</span>
+          <div class="g-def">${g.def}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderTraps(){
+  topbarTitle.textContent = 'Board Exam Traps';
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">20 consolidated gotchas</span></div>
+      <h1 class="view-title">Board Exam Traps</h1>
+      <p class="view-sub">Area-cap swaps, restriction-period mix-ups, and the two separate possession-period histories examiners love to test.</p>
+    </div>
+    <div class="trap-list">
+      ${traps.map((t,i) => `
+        <div class="trap-item" data-search="${(t.t+' '+t.b).toLowerCase().replace(/"/g,'&quot;')}">
+          <div class="tnum">TRAP ${i+1}</div>
+          <div class="ttitle">${t.t}</div>
+          <div class="tbody">${t.b}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderQuiz(reset){
+  topbarTitle.textContent = 'Self-Test Quiz';
+  if(reset){ quizIdx = 0; quizScore = 0; }
+  quizAnswered = false;
+
+  if(quizIdx >= quiz.length){
+    viewRoot.innerHTML = `
+      <div class="view-header">
+        <div class="eyebrow-row"><span class="badge-pill">Results</span></div>
+        <h1 class="view-title">Quiz Complete</h1>
+      </div>
+      <div class="quiz-box">
+        <div class="quiz-score">${quizScore} / ${quiz.length} correct
+          <div class="sub">${quizScore === quiz.length ? "Perfect score — codal mastery." : quizScore/quiz.length >= 0.7 ? "Solid — review the misses below and go again." : "Keep drilling the area caps and possession-period timelines, then retake."}</div>
+        </div>
+        <div class="quiz-nav" style="justify-content:center;">
+          <button class="btn" onclick="renderQuiz(true)">Retake Quiz</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const item = quiz[quizIdx];
+  viewRoot.innerHTML = `
+    <div class="view-header">
+      <div class="eyebrow-row"><span class="badge-pill">Self-Test</span></div>
+      <h1 class="view-title">Public Land Act Quiz</h1>
+      <p class="view-sub">Twenty questions drawn from CA 141 and its amendments.</p>
+    </div>
+    <div class="quiz-box">
+      <div class="quiz-progress">Question ${quizIdx+1} of ${quiz.length} &nbsp;·&nbsp; Score so far: ${quizScore}</div>
+      <div class="quiz-q">${item.q}</div>
+      <div class="quiz-opts">
+        ${item.opts.map((o,i) => `<button class="quiz-opt" onclick="answerQuiz(${i})">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-explain" id="quizExplain">${item.ex}</div>
+      <div class="quiz-nav">
+        <button class="btn ghost" onclick="renderQuiz(true)">Restart</button>
+        <button class="btn" id="quizNextBtn" style="opacity:.4; pointer-events:none;" onclick="nextQuiz()">Next →</button>
+      </div>
+    </div>
+  `;
+}
+
+function answerQuiz(i){
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const item = quiz[quizIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((btn, idx) => {
+    btn.classList.add('disabled');
+    if(idx === item.a) btn.classList.add('correct');
+    else if(idx === i) btn.classList.add('wrong');
+  });
+  if(i === item.a) quizScore++;
+  document.getElementById('quizExplain').classList.add('show');
+  const nb = document.getElementById('quizNextBtn');
+  nb.style.opacity = 1;
+  nb.style.pointerEvents = 'auto';
+}
+
+function nextQuiz(){
+  quizIdx++;
+  renderQuiz(false);
+}
+
+/* ============================================================
+   TAB SWITCHING + SEARCH
+   ============================================================ */
+const renderers = {
+  home: renderHome, law: renderLaw, modes: renderModes, related: renderRelated,
+  people: renderPeople, glossary: renderGlossary, traps: renderTraps,
+  quiz: () => renderQuiz(true)
+};
+
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('searchInput').value = '';
+  renderers[tab]();
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  const searchable = document.querySelectorAll('[data-search]');
+  if(!q){
+    searchable.forEach(el => el.classList.remove('hidden'));
+    document.querySelectorAll('.article-block, .article-heading').forEach(el => el.classList.remove('hidden'));
+    const nores = document.getElementById('noResults');
+    if(nores) nores.remove();
+    return;
+  }
+  let anyVisible = false;
+  searchable.forEach(el => {
+    const match = el.dataset.search.includes(q);
+    el.classList.toggle('hidden', !match);
+    if(match) anyVisible = true;
+    if(match && el.classList.contains('sec-card')){
+      el.classList.add('open');
+      const body = el.querySelector('.sec-body');
+      if(body) body.style.maxHeight = body.scrollHeight + 40 + 'px';
+    }
+  });
+  let nores = document.getElementById('noResults');
+  if(!anyVisible){
+    if(!nores){
+      nores = document.createElement('div');
+      nores.id = 'noResults';
+      nores.className = 'nores';
+      nores.textContent = 'No matches in this section. Try another tab.';
+      viewRoot.appendChild(nores);
+    }
+  } else if(nores){
+    nores.remove();
+  }
+});
+
+/* init */
+renderHome();
+</script>
+</body>
+</html>
